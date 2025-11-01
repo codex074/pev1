@@ -6,19 +6,18 @@
     <title>OPD - PE</title>
     <link rel="icon" href="icons/icon-192x192.png" type="image/png" />
 
-    <!-- PWA Manifest & Icons -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#3b82f6">
     <link rel="apple-touch-icon" href="icons/icon-180x180.png">
 
-    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
     
-    <!-- Custom Styles -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-piechart-3d@latest/dist/chartjs-plugin-piechart-3d.min.js"></script>
+    
     <style>
         body { box-sizing: border-box; }
         .thai-font { font-family: 'Sarabun', 'Noto Sans Thai', sans-serif; }
@@ -161,15 +160,184 @@
             78% { stroke-dasharray: 40 400; stroke-width: 30; stroke-dashoffset: -395; }
             86%, to { stroke-dasharray: 0 440; stroke-width: 20; stroke-dashoffset: -440; }
         }
+        
+        /* --- Export Excel Button Styles --- */
+        .bookmarkBtn {
+            width: 150px;
+            height: 40px;
+            border-radius: 40px;
+            border: 1px solid #d1d5db; /* Light gray border */
+            background-color: rgb(255, 255, 255); /* White background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition-duration: 0.3s;
+            overflow: hidden;
+        }
+        .bookmarkBtn .IconContainer {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(to bottom, rgb(110, 234, 131), rgb(45, 176, 70));
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            z-index: 2;
+            transition-duration: 0.3s;
+        }
+        .bookmarkBtn .icon {
+            border-radius: 1px;
+            fill: #fff; /* Icon color white */
+        }
+        .bookmarkBtn .text {
+            height: 100%;
+            width: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgb(12, 12, 12); /* Black text */
+            z-index: 1;
+            transition-duration: 0.3s;
+            font-size: 1.04em;
+            font-weight: 500;
+        }
+        .bookmarkBtn:hover .IconContainer {
+            width: 140px;
+            transition-duration: 0.3s;
+        }
+        .bookmarkBtn:hover .text {
+            transform: translate(10px);
+            width: 0;
+            font-size: 0;
+            transition-duration: 0.3s;
+        }
+        .bookmarkBtn:active {
+            transform: scale(0.95);
+            transition-duration: 0.3s;
+        }
+
+        /* --- Clear Filter Button Styles --- */
+        .clearBtn {
+            width: 150px; /* Adjusted width */
+            height: 40px;
+            border-radius: 40px;
+            border: 1px solid #d1d5db;
+            background-color: rgb(255, 255, 255);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition-duration: 0.3s;
+            overflow: hidden;
+        }
+        .clearBtn .IconContainer {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(to bottom, rgb(248, 113, 113), rgb(220, 38, 38)); /* Red tones */
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            z-index: 2;
+            transition-duration: 0.3s;
+        }
+        .clearBtn .icon {
+            border-radius: 1px;
+            fill: #fff;
+        }
+        .clearBtn .text {
+            height: 100%;
+            width: 110px; /* Adjusted width */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgb(12, 12, 12);
+            z-index: 1;
+            transition-duration: 0.3s;
+            font-size: 1.04em;
+            font-weight: 500;
+        }
+        .clearBtn:hover .IconContainer {
+            width: 140px; /* Adjusted width */
+            transition-duration: 0.3s;
+        }
+        .clearBtn:hover .text {
+            transform: translate(10px);
+            width: 0;
+            font-size: 0;
+            transition-duration: 0.3s;
+        }
+        .clearBtn:active {
+            transform: scale(0.95);
+            transition-duration: 0.3s;
+        }
+
+        /* --- Add Clinic Button Styles --- */
+        .addClinicBtn {
+            width: 150px; /* Adjusted width */
+            height: 40px;
+            border-radius: 40px;
+            border: 1px solid #d1d5db;
+            background-color: rgb(255, 255, 255);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition-duration: 0.3s;
+            overflow: hidden;
+        }
+        .addClinicBtn .IconContainer {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(to bottom, rgb(110, 234, 131), rgb(45, 176, 70)); /* Green tones */
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            z-index: 2;
+            transition-duration: 0.3s;
+        }
+        .addClinicBtn .icon {
+            border-radius: 1px;
+            fill: #fff;
+        }
+        .addClinicBtn .text {
+            height: 100%;
+            width: 110px; /* Adjusted width */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgb(12, 12, 12);
+            z-index: 1;
+            transition-duration: 0.3s;
+            font-size: 1.04em;
+            font-weight: 500;
+        }
+        .addClinicBtn:hover .IconContainer {
+            width: 140px; /* Adjusted width */
+            transition-duration: 0.3s;
+        }
+        .addClinicBtn:hover .text {
+            transform: translate(10px);
+            width: 0;
+            font-size: 0;
+            transition-duration: 0.3s;
+        }
+        .addClinicBtn:active {
+            transform: scale(0.95);
+            transition-duration: 0.3s;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-full thai-font">
     
-    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50" style="display: none;">
         <div class="text-center">
-             <!-- New SVG Loader -->
-            <svg class="pl mx-auto" width="120" height="120" viewBox="0 0 240 240">
+             <svg class="pl mx-auto" width="120" height="120" viewBox="0 0 240 240">
                 <circle class="pl__ring pl__ring--a" cx="120" cy="120" r="105" fill="none" stroke="#000" stroke-width="20" stroke-dasharray="0 660" stroke-dashoffset="-330" stroke-linecap="round"></circle>
                 <circle class="pl__ring pl__ring--b" cx="120" cy="120" r="35" fill="none" stroke="#000" stroke-width="20" stroke-dasharray="0 220" stroke-dashoffset="-110" stroke-linecap="round"></circle>
                 <circle class="pl__ring pl__ring--c" cx="85" cy="120" r="70" fill="none" stroke="#000" stroke-width="20" stroke-dasharray="0 440" stroke-linecap="round"></circle>
@@ -179,7 +347,6 @@
         </div>
     </div>
 
-    <!-- Header -->
     <header class="bg-white shadow-lg border-b-4 border-blue-600">
         <div class="container mx-auto px-4 py-6 text-center">
             <h1 class="text-2xl md:text-3xl font-bold text-blue-800 mb-2">ระบบเก็บข้อมูล Prescribing Error</h1>
@@ -187,7 +354,6 @@
         </div>
     </header>
 
-    <!-- Navigation Tabs -->
     <nav class="bg-blue-600 shadow-md">
         <div class="container mx-auto px-4">
             <div class="flex justify-center space-x-1">
@@ -197,11 +363,9 @@
         </div>
     </nav>
 
-    <!-- Page Content -->
     <div id="recordPage" class="container mx-auto px-4 py-8 max-w-2xl"></div>
     <div id="reportPage" class="container mx-auto px-4 py-8 hidden"></div>
 
-    <!-- Footer -->
     <footer class="text-center py-4">
         <p id="syncStatus" class="text-xs text-gray-500">กำลังเชื่อมต่อ...</p>
     </footer>
@@ -221,7 +385,7 @@
         let medErrorData = [];
         let clinics = ['อายุรกรรมทั่วไป', 'ศัลยกรรมกระดูก', 'ศัลยกรรมประสาท', 'สูติ-นรีเวช', 'โรคเลือด', 'ผิวหนัง', 'เบาหวาน', 'ความดัน']; // Default clinics
         const errorTypes = ['จำนวนยาไม่ถึงนัด', 'เกินวันนัด', 'สั่งยาวิธีใช้ off'];
-        let chart = null, pieChart = null, clinicChart = null;
+        let chart = null, pieChart = null, clinicChart = null, timeSlotChart = null;
         let isSyncing = false;
         let recentRecordsPage = 0, dataTablePage = 0;
         let currentFilteredData = [];
@@ -239,7 +403,7 @@
             if (storedClinics.length > 0) {
                 clinics = storedClinics;
             }
-            currentFilteredData = [...medErrorData];
+            // currentFilteredData = [...medErrorData]; // Removed for auto-filter
             showPage('record'); 
             await fetchDataFromSheet(); 
         });
@@ -320,8 +484,13 @@
         function renderRecordPage() {
             document.getElementById('recordPage').innerHTML = `
                 <div class="bg-white rounded-xl shadow-xl p-6 md:p-8 fade-in relative">
-                    <button onclick="showAddClinicModal()" class="absolute top-4 right-4 bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm font-bold py-2 px-3 rounded-lg transition-colors">
-                        Add Clinic
+                    <button onclick="showAddClinicModal()" class="addClinicBtn absolute top-4 right-4">
+                        <span class="IconContainer">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512" class="icon">
+                                <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"></path>
+                            </svg>
+                        </span>
+                        <p class="text">Add Clinic</p>
                     </button>
                     <div class="text-center mb-8">
                         <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"><span class="text-2xl">🏥</span></div>
@@ -358,12 +527,11 @@
         }
 
         function renderReportPage() {
-             const today = new Date().toISOString().split('T')[0];
-             const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+             // const today = new Date().toISOString().split('T')[0]; // No longer needed for default
+             // const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // Removed
              const clinicOptions = clinics.map(c => `<option value="${c}">${c}</option>`).join('');
              const errorTypeOptions = errorTypes.map(e => `<option value="${e}">${e}</option>`).join('');
              document.getElementById('reportPage').innerHTML = `<div class="space-y-6">
-                <!-- Filter Section -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
                         <h2 class="text-xl font-bold text-gray-800 mb-4 sm:mb-0">🔍 กรองข้อมูล</h2>
@@ -375,24 +543,39 @@
                         </button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                        <div><label class="block text-sm font-medium text-gray-700 mb-2">วันที่เริ่มต้น</label><input type="date" id="startDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="${weekAgo}"></div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-2">วันที่สิ้นสุด</label><input type="date" id="endDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="${today}"></div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-2">ประเภท Error</label><select id="errorTypeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg"><option value="all">ทั้งหมด</option>${errorTypeOptions}</select></div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-2">คลินิก</label><select id="clinicFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg"><option value="all">ทั้งหมด</option>${clinicOptions}</select></div>
-                        <div><button onclick="filterData()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">🔍 กรอง</button></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">วันที่เริ่มต้น</label><input type="date" id="startDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="" onchange="filterData()"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">วันที่สิ้นสุด</label><input type="date" id="endDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="" onchange="filterData()"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">ประเภท Error</label><select id="errorTypeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="filterData()"><option value="all">ทั้งหมด</option>${errorTypeOptions}</select></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">คลินิก</label><select id="clinicFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="filterData()"><option value="all">ทั้งหมด</option>${clinicOptions}</select></div>
+                        
+                        <div class="flex justify-center">
+                            <button onclick="clearFilters()" class="clearBtn">
+                                <span class="IconContainer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512" class="icon">
+                                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path>
+                                    </svg>
+                                </span>
+                                <p class="text">ล้างตัวกรอง</p>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <!-- Summary Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white rounded-xl shadow-lg p-6 text-center"><div class="text-3xl mb-2">📊</div><div class="text-2xl font-bold text-blue-600" id="totalErrors">0</div><div class="text-gray-600">จำนวนรวม</div></div>
                     <div class="bg-white rounded-xl shadow-lg p-6 text-center"><div class="text-3xl mb-2">📅</div><div class="text-2xl font-bold text-green-600" id="todayErrors">0</div><div class="text-gray-600">วันนี้</div></div>
                     <div class="bg-white rounded-xl shadow-lg p-6 text-center"><div class="text-3xl mb-2">📈</div><div class="text-2xl font-bold text-orange-600" id="avgDaily">0</div><div class="text-gray-600">เฉลี่ยต่อวัน</div></div>
                 </div>
-                <!-- Charts -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold text-gray-800">📈 กราฟรายวัน</h3>
-                        <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm">📥 Export Excel</button>
+                        <button onclick="exportToExcel()" class="bookmarkBtn">
+                            <span class="IconContainer">
+                                <svg viewBox="0 0 512 512" height="0.9em" class="icon">
+                                    <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zM432 456c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"></path>
+                                </svg>
+                            </span>
+                            <p class="text">Export Excel</p>
+                        </button>
                     </div>
                     <div class="h-80"><canvas id="errorChart"></canvas></div>
                 </div>
@@ -402,11 +585,17 @@
                         <div class="h-80 w-full max-w-md mx-auto"><canvas id="pieChart"></canvas></div>
                     </div>
                     <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">🏥 จำนวน Error แยกตามคลินิก</h3>
+                        <div class="flex justify-center items-center mb-4 relative">
+                            <h3 class="text-lg font-semibold text-gray-800 text-center">🏥 จำนวน Error แยกตามคลินิก</h3>
+                            <button onclick="showAllClinicsModal()" class="absolute right-0 top-0 text-sm text-blue-600 hover:text-blue-800 font-medium">ดูทั้งหมด</button>
+                        </div>
                         <div class="h-80 w-full mx-auto"><canvas id="clinicBarChart"></canvas></div>
                     </div>
                 </div>
-                <!-- Data Table -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">⏰ จำนวน Error แยกตามช่วงเวลา</h3>
+                    <div class="h-80 w-full mx-auto"><canvas id="timeSlotChart"></canvas></div>
+                </div>
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold text-gray-800">📋 ตารางข้อมูลรายละเอียด</h3>
@@ -660,6 +849,46 @@
             }
         }
 
+        // *** NEW FUNCTION: Show All Clinics Modal ***
+        function showAllClinicsModal() {
+            // 1. Get counts from currentFilteredData
+            const clinicCounts = currentFilteredData.reduce((acc, { clinic }) => {
+                if (clinic) {
+                    acc[clinic] = (acc[clinic] || 0) + 1;
+                }
+                return acc;
+            }, {});
+
+            // 2. Sort by count, descending
+            const sortedClinics = Object.entries(clinicCounts).sort(([, a], [, b]) => b - a);
+
+            // 3. Generate HTML for the modal
+            let modalHtml = '<div class="text-left max-h-80 overflow-y-auto px-4">';
+            if (sortedClinics.length === 0) {
+                modalHtml += '<p class="text-center text-gray-500">ไม่มีข้อมูล</p>';
+            } else {
+                modalHtml += '<ul class="divide-y divide-gray-200">';
+                sortedClinics.forEach(([clinic, count], index) => {
+                    modalHtml += `
+                        <li class="py-3 flex justify-between items-center">
+                            <span class="font-medium text-gray-700">${index + 1}. ${clinic}</span>
+                            <span class="font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full text-sm">${count}</span>
+                        </li>
+                    `;
+                });
+                modalHtml += '</ul>';
+            }
+            modalHtml += '</div>';
+
+            // 4. Show SweetAlert
+            Swal.fire({
+                title: 'รายละเอียด Error ตามคลินิก',
+                html: modalHtml,
+                width: '500px',
+                confirmButtonText: 'ปิด'
+            });
+        }
+
         function filterClinics() {
             const input = document.getElementById('clinic-search-input');
             const dropdown = document.getElementById('clinic-dropdown');
@@ -804,6 +1033,15 @@
 
         // --- Report Page Logic ---
         function loadReportData() { dataTablePage = 0; filterData(); }
+
+        function clearFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('errorTypeFilter').value = 'all';
+            document.getElementById('clinicFilter').value = 'all';
+            filterData();
+        }
+
         function filterData() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
@@ -811,14 +1049,16 @@
             const clinic = document.getElementById('clinicFilter').value;
             let filtered = medErrorData;
             
-            if (startDate && endDate) { 
-                const start = new Date(startDate).setHours(0,0,0,0); 
-                const end = new Date(endDate).setHours(23,59,59,999); 
-                filtered = filtered.filter(r => {
-                    const recordDate = new Date(r.timestamp);
-                    return recordDate >= start && recordDate <= end;
-                });
+            // Date filtering logic
+            if (startDate) {
+                const start = new Date(startDate).setHours(0,0,0,0);
+                filtered = filtered.filter(r => new Date(r.timestamp) >= start);
             }
+            if (endDate) {
+                const end = new Date(endDate).setHours(23,59,59,999);
+                filtered = filtered.filter(r => new Date(r.timestamp) <= end);
+            }
+
             if (errorType !== 'all') filtered = filtered.filter(r => r.errorType === errorType);
             if (clinic !== 'all') filtered = filtered.filter(r => r.clinic === clinic);
 
@@ -828,6 +1068,7 @@
             updateChart(currentFilteredData); 
             updatePieChart(currentFilteredData);
             updateClinicChart(currentFilteredData);
+            updateTimeSlotChart(currentFilteredData);
             updateDataTable();
         }
 
@@ -856,7 +1097,47 @@
                 return new Date(`${yearA - 543}-${monthA}-${dayA}`) - new Date(`${yearB - 543}-${monthB}-${dayB}`);
             });
             if (chart) chart.destroy();
-            chart = new Chart(ctx, { type: 'line', data: { labels: sortedDates, datasets: [{ label: 'จำนวน Med Error', data: sortedDates.map(date => dailyData[date]), borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 3, fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } } });
+            chart = new Chart(ctx, { 
+                type: 'line', 
+                data: { 
+                    labels: sortedDates, 
+                    datasets: [{ 
+                        label: 'จำนวน Med Error', 
+                        data: sortedDates.map(date => dailyData[date]), 
+                        borderColor: 'rgb(59, 130, 246)', 
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)', 
+                        borderWidth: 3, 
+                        fill: true, 
+                        tension: 0.4 
+                    }] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    scales: { 
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { stepSize: 1 } 
+                        } 
+                    },
+                    plugins: {
+                        datalabels: {
+                            display: true,
+                            align: 'top',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                            borderColor: 'rgba(59, 130, 246, 0.5)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            color: '#1e3a8a', // Dark blue
+                            font: {
+                                weight: 'bold',
+                                family: "'Sarabun', 'Noto Sans Thai', sans-serif"
+                            },
+                            formatter: (value) => value > 0 ? value : ''
+                        }
+                    }
+                } 
+            });
         }
         
         function updatePieChart(data) {
@@ -867,7 +1148,56 @@
             const counts = Object.values(errorCounts);
             const backgroundColors = ['#4A90E2', '#50E3C2', '#F5A623', '#D0021B', '#BD10E0', '#7ED321'];
             if (pieChart) pieChart.destroy();
-            pieChart = new Chart(pieCtx, { type: 'pie', data: { labels: labels, datasets: [{ label: 'จำนวน', data: counts, backgroundColor: backgroundColors, hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { padding: 15, font: { family: "'Sarabun', 'Noto Sans Thai', sans-serif" } } }, datalabels: { formatter: (value, ctx) => { const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0); return total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%'; }, color: '#fff', font: { weight: 'bold', family: "'Sarabun', 'Noto Sans Thai', sans-serif" } } } } });
+            pieChart = new Chart(pieCtx, { 
+                type: 'pie', 
+                data: { 
+                    labels: labels, 
+                    datasets: [{ 
+                        label: 'จำนวน', 
+                        data: counts, 
+                        backgroundColor: backgroundColors, 
+                        hoverOffset: 4 
+                    }] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { 
+                                padding: 15, 
+                                font: { 
+                                    family: "'Sarabun', 'Noto Sans Thai', sans-serif" 
+                                } 
+                            } 
+                        }, 
+                        datalabels: { 
+                            formatter: (value, ctx) => { 
+                                const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0); 
+                                return total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%'; 
+                            }, 
+                            color: '#fff', 
+                            font: { 
+                                weight: 'bold', 
+                                family: "'Sarabun', 'Noto Sans Thai', sans-serif" 
+                            } 
+                        },
+                        // Add 3D plugin config
+                        piechart3d: {
+                            enabled: true,
+                            angle: 45, // Angle of tilt
+                            depth: 25, // Thickness
+                            shadow: {
+                                enabled: true,
+                                color: 'rgba(0,0,0,0.3)',
+                                opacity: 0.8,
+                                blur: 10
+                            }
+                        }
+                    } 
+                } 
+            });
         }
 
         function updateClinicChart(data) {
@@ -881,10 +1211,31 @@
                 return acc;
             }, {});
 
+            // *** MODIFIED: Logic for Top 11 + Others ***
             const sortedClinics = Object.entries(clinicCounts).sort(([, a], [, b]) => b - a);
-            const labels = sortedClinics.map(([clinic]) => clinic);
-            const counts = sortedClinics.map(([, count]) => count);
-            const backgroundColors = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#EF4444', '#6366F1', '#FBBF24', '#22C55E', '#D946EF'];
+            
+            let labels;
+            let counts;
+            
+            if (sortedClinics.length > 11) {
+                const top11 = sortedClinics.slice(0, 11);
+                const others = sortedClinics.slice(11);
+                const othersCount = others.reduce((sum, [, count]) => sum + count, 0);
+
+                labels = top11.map(([clinic]) => clinic);
+                counts = top11.map(([, count]) => count);
+
+                if (othersCount > 0) {
+                    labels.push('อื่นๆ');
+                    counts.push(othersCount);
+                }
+            } else {
+                labels = sortedClinics.map(([clinic]) => clinic);
+                counts = sortedClinics.map(([, count]) => count);
+            }
+            // *** END MODIFICATION ***
+
+            const backgroundColors = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#EF4444', '#6366F1', '#FBBF24', '#22C55E', '#D946EF', '#6B7280', '#14B8A6']; // Added more colors
 
             if (clinicChart) clinicChart.destroy();
 
@@ -900,7 +1251,7 @@
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // Horizontal bar chart for better readability of clinic names
+                    indexAxis: 'y', // Horizontal bar chart
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
@@ -919,6 +1270,82 @@
                             anchor: 'end',
                             align: 'right',
                             color: '#374151',
+                            font: {
+                                weight: 'bold',
+                                family: "'Sarabun', 'Noto Sans Thai', sans-serif"
+                            },
+                             formatter: (value) => value > 0 ? value : ''
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTimeSlotChart(data) {
+            const barCtx = document.getElementById('timeSlotChart')?.getContext('2d');
+            if (!barCtx) return;
+
+            const timeSlots = {
+                '07:00-09:59': 0,
+                '10:00-11:59': 0,
+                '12:00-13:59': 0,
+                '14:00-16:30': 0,
+            };
+
+            data.forEach(record => {
+                const recordDate = new Date(record.timestamp);
+                const hours = recordDate.getHours();
+                const minutes = recordDate.getMinutes();
+                const time = hours + (minutes / 60); // Convert to decimal e.g., 9:59 -> 9.983
+
+                if (time >= 7.0 && time < 10.0) { // 07:00 to 09:59
+                    timeSlots['07:00-09:59']++;
+                } else if (time >= 10.0 && time < 12.0) { // 10:00 to 11:59
+                    timeSlots['10:00-11:59']++;
+                } else if (time >= 12.0 && time < 14.0) { // 12:00 to 13:59
+                    timeSlots['12:00-13:59']++;
+                } else if (time >= 14.0 && time <= 16.5) { // 14:00 to 16:30
+                    timeSlots['14:00-16:30']++;
+                }
+            });
+
+            const labels = Object.keys(timeSlots);
+            const counts = Object.values(timeSlots);
+            const backgroundColors = ['#1abc9c', '#3498db', '#9b59b6', '#f1c40f'];
+
+            if (timeSlotChart) timeSlotChart.destroy();
+
+            timeSlotChart = new Chart(barCtx, {
+                type: 'bar', // Vertical bar chart
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'จำนวน Error',
+                        data: counts,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1 
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        // *** MODIFIED: Datalabels inside bar ***
+                        datalabels: {
+                            anchor: 'center',
+                            align: 'center',
+                            color: '#ffffff', // White color for contrast
                             font: {
                                 weight: 'bold',
                                 family: "'Sarabun', 'Noto Sans Thai', sans-serif"
