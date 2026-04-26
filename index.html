@@ -389,6 +389,8 @@
         let isSyncing = false;
         let recentRecordsPage = 0, dataTablePage = 0;
         let currentFilteredData = [];
+        let loadedStartDate = null;
+        let loadedEndDate = null;
         const RECENT_ITEMS_PER_PAGE = 10;
         const DATA_TABLE_ITEMS_PER_PAGE = 20;
         let highlightedIndex = -1; 
@@ -397,28 +399,46 @@
         Chart.register(ChartDataLabels);
 
         // --- App Initialization ---
+        function getCurrentMonthStart() {
+            const now = new Date();
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+        }
+
+        function getCurrentMonthEnd() {
+            const now = new Date();
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             medErrorData = JSON.parse(localStorage.getItem('medErrorData')) || [];
             const storedClinics = JSON.parse(localStorage.getItem('clinics')) || [];
             if (storedClinics.length > 0) {
                 clinics = storedClinics;
             }
-            // currentFilteredData = [...medErrorData]; // Removed for auto-filter
-            showPage('record'); 
-            await fetchDataFromSheet(); 
+            showPage('record');
+            await fetchDataFromSheet(getCurrentMonthStart(), getCurrentMonthEnd());
         });
 
         // --- Data Fetching ---
-        async function fetchDataFromSheet() {
+        async function fetchDataFromSheet(startDate, endDate) {
             if (isSyncing) return;
             isSyncing = true;
             showLoading(true);
             document.getElementById('syncStatus').textContent = 'กำลังซิงค์ข้อมูล...';
             try {
-                const response = await fetch(scriptURL);
+                const fetchStart = startDate !== undefined ? startDate : (loadedStartDate || getCurrentMonthStart());
+                const fetchEnd = endDate !== undefined ? endDate : (loadedEndDate || getCurrentMonthEnd());
+
+                const params = new URLSearchParams();
+                if (fetchStart) params.append('startDate', fetchStart);
+                if (fetchEnd) params.append('endDate', fetchEnd);
+                const url = scriptURL + '?' + params.toString();
+
+                const response = await fetch(url);
                 if (!response.ok) throw new Error(`Network response error: ${response.statusText}`);
                 const result = await response.json();
-                
+
                 if (result.status === 'success') {
                     const rawData = (result.data.pe || []);
                     medErrorData = rawData.map(record => {
@@ -428,15 +448,17 @@
                             date: formatDateToThaiString(recordDate),
                             time: formatTimeToThaiString(recordDate)
                         };
-                    }).sort((a, b) => b.id - a.id); 
+                    }).sort((a, b) => b.id - a.id);
 
+                    loadedStartDate = fetchStart;
+                    loadedEndDate = fetchEnd;
                     clinics = result.data.clinics || clinics;
                     localStorage.setItem('medErrorData', JSON.stringify(medErrorData));
                     localStorage.setItem('clinics', JSON.stringify(clinics));
                     updateUIAfterFetch();
                     document.getElementById('syncStatus').textContent = `อัปเดตล่าสุด: ${new Date().toLocaleTimeString('th-TH')}`;
-                } else { 
-                    throw new Error(result.message || 'Unknown server error'); 
+                } else {
+                    throw new Error(result.message || 'Unknown server error');
                 }
             } catch (error) {
                 console.error('Fetch Error:', error);
@@ -543,8 +565,8 @@
                         </button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                        <div><label class="block text-sm font-medium text-gray-700 mb-2">วันที่เริ่มต้น</label><input type="date" id="startDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="" onchange="filterData()"></div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-2">วันที่สิ้นสุด</label><input type="date" id="endDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="" onchange="filterData()"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">วันที่เริ่มต้น</label><input type="date" id="startDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="${getCurrentMonthStart()}" onchange="filterData()"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">วันที่สิ้นสุด</label><input type="date" id="endDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="${getCurrentMonthEnd()}" onchange="filterData()"></div>
                         <div><label class="block text-sm font-medium text-gray-700 mb-2">ประเภท Error</label><select id="errorTypeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="filterData()"><option value="all">ทั้งหมด</option>${errorTypeOptions}</select></div>
                         <div><label class="block text-sm font-medium text-gray-700 mb-2">คลินิก</label><select id="clinicFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="filterData()"><option value="all">ทั้งหมด</option>${clinicOptions}</select></div>
                         
@@ -1035,21 +1057,31 @@
         function loadReportData() { dataTablePage = 0; filterData(); }
 
         function clearFilters() {
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
+            document.getElementById('startDate').value = getCurrentMonthStart();
+            document.getElementById('endDate').value = getCurrentMonthEnd();
             document.getElementById('errorTypeFilter').value = 'all';
             document.getElementById('clinicFilter').value = 'all';
             filterData();
         }
 
-        function filterData() {
+        async function filterData() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             const errorType = document.getElementById('errorTypeFilter').value;
             const clinic = document.getElementById('clinicFilter').value;
+
+            // If user selects dates outside the already-loaded range, refetch from server
+            const needsRefetch =
+                (startDate && loadedStartDate && startDate < loadedStartDate) ||
+                (endDate && loadedEndDate && endDate > loadedEndDate);
+
+            if (needsRefetch) {
+                await fetchDataFromSheet(startDate || undefined, endDate || undefined);
+                return; // updateUIAfterFetch → loadReportData → filterData will rerun
+            }
+
             let filtered = medErrorData;
-            
-            // Date filtering logic
+
             if (startDate) {
                 const start = new Date(startDate).setHours(0,0,0,0);
                 filtered = filtered.filter(r => new Date(r.timestamp) >= start);
@@ -1064,8 +1096,8 @@
 
             currentFilteredData = filtered;
             dataTablePage = 0;
-            updateSummaryCards(currentFilteredData); 
-            updateChart(currentFilteredData); 
+            updateSummaryCards(currentFilteredData);
+            updateChart(currentFilteredData);
             updatePieChart(currentFilteredData);
             updateClinicChart(currentFilteredData);
             updateTimeSlotChart(currentFilteredData);
